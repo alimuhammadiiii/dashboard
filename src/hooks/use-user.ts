@@ -7,7 +7,6 @@ interface User {
   name: string;
   email: string;
   image?: string;
-  picture?: string;
 }
 
 export function useUser() {
@@ -30,7 +29,7 @@ export function useUser() {
     } else {
       router.replace("/login");
     }
-    
+
     setLoading(false);
   }, [router]);
 

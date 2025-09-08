@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import z from "zod";
 import {
   Card,
   CardContent,
@@ -14,6 +13,8 @@ import { useForm } from "@tanstack/react-form";
 import { LoaderCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
+import { loginFormOptions, loginFormSchema } from "./shared-code";
+import loginAction from "./action";
 
 async function mockLoginApi() {
   await new Promise((res) => setTimeout(res, 1000));
@@ -29,12 +30,9 @@ export default function Login() {
   const router = useRouter();
 
   const loginForm = useForm({
-    defaultValues: {
-      phoneNumber: "",
-    },
-
+    ...loginFormOptions,
     validators: {
-      onChange: phoneNumberSchema,
+      onChange: loginFormSchema,
     },
     onSubmit: async ({ value }) => {
       const user = await mockLoginApi();
@@ -64,13 +62,13 @@ export default function Login() {
           </CardHeader>
           <CardContent>
             <form
+              action={loginAction as never}
               onSubmit={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 loginForm.handleSubmit();
               }}
             >
-              {" "}
               <div>
                 <loginForm.Field name="phoneNumber">
                   {(field) => {
@@ -119,9 +117,3 @@ export default function Login() {
     </div>
   );
 }
-
-const phoneNumberSchema = z.object({
-  phoneNumber: z
-    .string()
-    .regex(/^(09\d{9}|\+989\d{9}|00989\d{9})$/, "شماره تلفن نامعتبر است"),
-});
