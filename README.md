@@ -1,36 +1,145 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Dashboard (Next.js + Tailwind v4, RTL, Mock Auth)
+
+A production-ready Next.js 15 app with an RTL Persian interface, a simple mock authentication flow, reusable UI primitives (Radix + Tailwind v4), and a responsive dashboard layout with a collapsible sidebar.
+
+### Tech Stack
+- **Framework**: [Next.js 15](https://nextjs.org) (App Router)
+- **UI & Styling**: Tailwind CSS v4, Radix UI, `lucide-react`
+- **Forms & Validation**: `@tanstack/react-form`, `zod`
+- **State/Utilities**: `clsx`, `class-variance-authority`, `tailwind-merge`
+- **Feedback**: `sonner`
+
+### Features
+- **RTL & Persian locale**: `lang="fa"`, `dir="rtl"` defined in `src/app/layout.tsx`
+- **Mock authentication**: Login stores a mock user in `localStorage` and redirects to `/dashboard`
+- **Protected dashboard layout**: Redirect-like guard in `src/app/dashboard/layout.tsx`
+- **Reusable UI components**: Buttons, Inputs, Cards, Sidebar, Tooltip, Avatar, etc.
+- **Responsive design**: Mobile-friendly layout with a collapsible sidebar
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Requirements
+- Node.js 18.18+ or 20+
+- npm, pnpm, yarn, or bun
 
+### Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+# or: pnpm install / yarn / bun install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Development
+```bash
+npm run dev
+```
+Then open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build
+```bash
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Start (production)
+```bash
+npm run start
+```
 
-## Learn More
+### Lint
+```bash
+npm run lint
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How It Works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### App entry and layout
+```src/app/layout.tsx``` sets the global HTML with `dir="rtl"` and imports `globals.css`. All pages inherit this.
 
-## Deploy on Vercel
+### Public routes
+- ```src/app/page.tsx``` – Landing page with links to the dashboard and login
+- ```src/app/login/page.tsx``` – Login form (phone number) using `@tanstack/react-form` and `zod`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Auth (mock) flow
+- On submit, the login page saves a mock user to `localStorage` under the key `user` and navigates to `/dashboard`
+- ```src/hooks/use-user.ts``` reads the stored user and exposes `user`, `loading`, and `logout`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Protected routes
+- ```src/app/dashboard/layout.tsx``` checks `useUser()`
+  - If loading: shows a loading message
+  - If unauthenticated: shows a transitional message to login
+  - If authenticated: renders the dashboard with `AppSidebar` and page content
+- ```src/app/dashboard/page.tsx``` displays user avatar, name, and email using UI primitives
+
+### UI components
+Key components live in ```src/components/ui```: `button`, `input`, `card`, `label`, `avatar`, `tooltip`, `separator`, `skeleton`, `sidebar`, `sheet`, `sonner`.
+
+The app’s sidebar wrapper and trigger are used in the dashboard layout to provide a responsive, collapsible navigation.
+
+---
+
+## Project Structure
+```
+src/
+  app/
+    dashboard/
+      layout.tsx      # Protected shell with sidebar
+      page.tsx        # Dashboard content (user info)
+    login/
+      action.ts       # Server action placeholder
+      page.tsx        # Login form with TanStack Form + Zod
+      shared-code.ts  # Form schema/config
+    globals.css       # Tailwind v4 styles
+    layout.tsx        # Global HTML (fa-IR, RTL)
+    page.tsx          # Landing page
+  components/
+    app-sidebar.tsx   # App sidebar
+    ui/               # Reusable UI primitives (Radix + Tailwind)
+  hooks/
+    use-user.ts       # Mock auth state from localStorage
+    use-mobile.ts     # Mobile detection helpers
+  lib/
+    utils.ts          # Utility helpers
+public/
+  icons/user.jpg      # Default user avatar
+  fonts/              # Vazirmatn fonts
+```
+
+---
+
+## Customization
+
+- **Branding & text**: Update Persian copy in `src/app/**`
+- **Default user avatar**: Replace `public/icons/user.jpg`
+- **Theme**: Tailwind v4 is set up in `globals.css`; adjust tokens/utilities as needed
+- **Sidebar items**: Edit `src/components/app-sidebar.tsx`
+- **Form validation**: Update `src/app/login/shared-code.ts` (Zod schema and form options)
+
+---
+
+## Deployment
+
+- **Vercel (recommended)**: Next.js runs natively. Create a project and connect this repo. Set build command to `npm run build` and output as `.next` (defaults are fine). See [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying).
+
+- **Netlify**: A basic `netlify.toml` with SPA-style redirects is included. For full SSR/ISR support, configure Next on Netlify using the official adapter/plugin. See Netlify’s Next docs.
+
+---
+
+## Scripts
+- **dev**: Start the development server
+- **build**: Create a production build
+- **start**: Start the production server
+- **lint**: Run ESLint checks
+
+---
+
+## Notes & Limitations
+- Authentication is mocked: no real backend or sessions. Replace the `mockLoginApi` in `src/app/login/page.tsx` and the `useUser` hook with your real auth logic.
+- The app is RTL and Persian by default. Change `lang`/`dir` in `src/app/layout.tsx` for other locales.
+
+---
+
+## License
+This repository is provided as-is for demonstration and internal use. Add your preferred license here.
